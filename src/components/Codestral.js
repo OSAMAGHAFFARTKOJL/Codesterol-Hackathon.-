@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import MistralClient from '@mistralai/mistralai';
 import { FaSpinner } from 'react-icons/fa';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const Codestral = () => {
     const apiKey = process.env.REACT_APP_API_KEY;
@@ -65,6 +67,24 @@ const Codestral = () => {
         setLoadingDoc(false);
     };
 
+    const downloadPDF = (content, title) => {
+        const doc = new jsPDF();
+        doc.setFontSize(12);
+        doc.text(title, 10, 10);
+        doc.setFontSize(10);
+        const lines = doc.splitTextToSize(content, 180);
+        doc.text(lines, 10, 20);
+        doc.save(`${title}.pdf`);
+    };
+
+    const downloadCorrectedCodePDF = () => {
+        downloadPDF(correctedCode, 'Corrected_Code');
+    };
+
+    const downloadDocumentationPDF = () => {
+        downloadPDF(documentation, 'Generated_Documentation');
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
             <h1 className="text-3xl font-bold mb-6 text-center">Code Documentation Generator</h1>
@@ -110,12 +130,24 @@ const Codestral = () => {
                 <div ref={correctedCodeRef} className="w-full max-w-3xl bg-white p-6 rounded-md shadow-md mb-6">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Corrected Code</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{correctedCode}</pre>
+                    <button
+                        onClick={downloadCorrectedCodePDF}
+                        className="w-full px-6 py-2 mt-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                    >
+                        Download Corrected Code as PDF
+                    </button>
                 </div>
             )}
             {documentation && (
                 <div ref={documentationRef} className="w-full max-w-3xl bg-white p-6 rounded-md shadow-md">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Generated Documentation</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{documentation}</pre>
+                    <button
+                        onClick={downloadDocumentationPDF}
+                        className="w-full px-6 py-2 mt-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                    >
+                        Download Documentation as PDF
+                    </button>
                 </div>
             )}
         </div>
