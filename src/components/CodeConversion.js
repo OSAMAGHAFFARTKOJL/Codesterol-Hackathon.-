@@ -2,20 +2,21 @@ import React, { useState, useRef } from 'react';
 import MistralClient from '@mistralai/mistralai';
 import { FaSpinner } from 'react-icons/fa';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 import toast from 'react-hot-toast';
 
 
-const CodeReviewAssistant = ({ apiKey }) => {
+const CodeConversionAssistant = ({ apiKey }) => {
     const client = new MistralClient(apiKey);
 
     const [code, setCode] = useState('');
-    const [reviewResult, setReviewResult] = useState('');
+    const [targetLanguage, setTargetLanguage] = useState('');
+    const [conversionResult, setConversionResult] = useState('');
     const [loading, setLoading] = useState(false);
-    const reviewRef = useRef(null);
+    const conversionRef = useRef(null);
 
-    const scrollToReview = () => {
-        reviewRef.current.scrollIntoView({ behavior: 'smooth' });
+    const scrollToConversion = () => {
+        conversionRef.current.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleFileUpload = (event) => {
@@ -27,19 +28,19 @@ const CodeReviewAssistant = ({ apiKey }) => {
         reader.readAsText(file);
     };
 
-    const reviewCode = async () => {
+    const convertCode = async () => {
         setLoading(true);
         try {
             const chatResponse = await client.chat({
                 model: 'mistral-tiny',
-                messages: [{ role: 'user', content: `Review the following code: ${code}` }],
+                messages: [{ role: 'user', content: `Convert the following code to ${targetLanguage}:\n${code}` }],
             });
 
-            setReviewResult(chatResponse.choices[0].message.content);
-            scrollToReview();
-            return toast.success('Code reviewed successfully!');
+            setConversionResult(chatResponse.choices[0].message.content);
+            scrollToConversion();
+            return toast.success('Code converted successfully!');
         } catch (error) {
-            return toast.error('Error reviewing code! Please try again.');
+            return toast.error('Error converting code! Please try again.');
         } finally {
             setLoading(false);
         }
@@ -47,13 +48,14 @@ const CodeReviewAssistant = ({ apiKey }) => {
 
     const downloadPDF = () => {
         const doc = new jsPDF();
-        doc.text('Code Review Result', 14, 22);
-        autoTable(doc, {
-            startY: 28,
-            head: [['Review']],
-            body: [[reviewResult]],
+        doc.text('Converted Code', 14, 20);
+        doc.autoTable({
+            startY: 30,
+            head: [['Code']],
+            body: [[conversionResult]],
+            styles: { fontSize: 10 },
         });
-        doc.save('code_review_result.pdf');
+        doc.save('Converted_Code.pdf');
     };
 
     return (
@@ -72,22 +74,29 @@ const CodeReviewAssistant = ({ apiKey }) => {
                 onChange={handleFileUpload}
                 className="mb-4"
             />
+            <input
+                type="text"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+                placeholder="Enter target language..."
+                className="w-full p-4 mb-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"
+            />
             <button
-                onClick={reviewCode}
+                onClick={convertCode}
                 className={`w-full px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75 flex items-center justify-center ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
                 disabled={loading}
             >
-                {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Review Code'}
+                {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Convert Code'}
             </button>
-            {reviewResult && (
-                <div ref={reviewRef} className="mt-4">
-                    <h2 className="text-2xl font-semibold mb-4 text-center">Code Review Result</h2>
-                    <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{reviewResult}</pre>
+            {conversionResult && (
+                <div ref={conversionRef} className="mt-4">
+                    <h2 className="text-2xl font-semibold mb-4 text-center">Converted Code</h2>
+                    <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{conversionResult}</pre>
                     <button
                         onClick={downloadPDF}
-                        className="w-full px-6 py-2 bg-red-600 text-white font-semibold rounded-md shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 mt-4"
+                        className="mt-4 px-6 py-2 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75"
                     >
-                        Download as PDF
+                        Download PDF
                     </button>
                 </div>
             )}
@@ -95,4 +104,4 @@ const CodeReviewAssistant = ({ apiKey }) => {
     );
 };
 
-export default CodeReviewAssistant;
+export default CodeConversionAssistant;

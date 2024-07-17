@@ -3,6 +3,8 @@ import MistralClient from '@mistralai/mistralai';
 import { FaSpinner } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import toast from 'react-hot-toast';
+
 
 const CodeDocumentationGenerator = ({ apiKey }) => {
     const client = new MistralClient(apiKey);
@@ -16,6 +18,15 @@ const CodeDocumentationGenerator = ({ apiKey }) => {
         documentationRef.current.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setCode(e.target.result);
+        };
+        reader.readAsText(file);
+    };
+
     const generateDocumentation = async () => {
         setLoading(true);
         try {
@@ -26,10 +37,12 @@ const CodeDocumentationGenerator = ({ apiKey }) => {
 
             setDocumentation(chatResponse.choices[0].message.content);
             scrollToDocumentation();
+            return toast.success('Documentation generated successfully!');
         } catch (error) {
-            console.log('Error:', error.message);
+            return toast.error('Error generating documentation! Please try again.');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const downloadPDF = () => {
@@ -52,6 +65,12 @@ const CodeDocumentationGenerator = ({ apiKey }) => {
                 cols="50"
                 placeholder="Enter your code here..."
                 className="w-full p-4 mb-4 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"
+            />
+            <input
+                type="file"
+                accept=".txt,.js,.jsx,.ts,.tsx,.py,.htm,.html,.css"
+                onChange={handleFileUpload}
+                className="mb-4"
             />
             <button
                 onClick={generateDocumentation}
