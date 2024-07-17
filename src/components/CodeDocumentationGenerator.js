@@ -12,11 +12,6 @@ const CodeDocumentationGenerator = ({ apiKey }) => {
     const [code, setCode] = useState('');
     const [documentation, setDocumentation] = useState('');
     const [loading, setLoading] = useState(false);
-    const documentationRef = useRef(null);
-
-    const scrollToDocumentation = () => {
-        documentationRef.current.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -36,7 +31,6 @@ const CodeDocumentationGenerator = ({ apiKey }) => {
             });
 
             setDocumentation(chatResponse.choices[0].message.content);
-            scrollToDocumentation();
             return toast.success('Documentation generated successfully!');
         } catch (error) {
             return toast.error('Error generating documentation! Please try again.');
@@ -80,7 +74,7 @@ const CodeDocumentationGenerator = ({ apiKey }) => {
                 {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Generate Documentation'}
             </button>
             {documentation && (
-                <div ref={documentationRef} className="mt-4">
+                <div className="mt-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Generated Documentation</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{documentation}</pre>
                     <button

@@ -12,11 +12,6 @@ const CodeReviewAssistant = ({ apiKey }) => {
     const [code, setCode] = useState('');
     const [reviewResult, setReviewResult] = useState('');
     const [loading, setLoading] = useState(false);
-    const reviewRef = useRef(null);
-
-    const scrollToReview = () => {
-        reviewRef.current.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -36,8 +31,8 @@ const CodeReviewAssistant = ({ apiKey }) => {
             });
 
             setReviewResult(chatResponse.choices[0].message.content);
-            scrollToReview();
-            return toast.success('Code reviewed successfully!');
+            toast.success('Code reviewed successfully!');
+            return;
         } catch (error) {
             return toast.error('Error reviewing code! Please try again.');
         } finally {
@@ -80,7 +75,7 @@ const CodeReviewAssistant = ({ apiKey }) => {
                 {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Review Code'}
             </button>
             {reviewResult && (
-                <div ref={reviewRef} className="mt-4">
+                <div className="mt-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Code Review Result</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{reviewResult}</pre>
                     <button

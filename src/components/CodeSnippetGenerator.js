@@ -12,11 +12,6 @@ const CodeSnippetGenerator = ({ apiKey }) => {
     const [description, setDescription] = useState('');
     const [generatedCode, setGeneratedCode] = useState('');
     const [loading, setLoading] = useState(false);
-    const snippetRef = useRef(null);
-
-    const scrollToSnippet = () => {
-        snippetRef.current.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -36,7 +31,6 @@ const CodeSnippetGenerator = ({ apiKey }) => {
             });
 
             setGeneratedCode(chatResponse.choices[0].message.content);
-            scrollToSnippet();
             return toast.success('Code snippet generated successfully!');
         } catch (error) {
             return toast.error('Error generating code snippet! Please try again.');
@@ -80,7 +74,7 @@ const CodeSnippetGenerator = ({ apiKey }) => {
                 {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Generate Snippet'}
             </button>
             {generatedCode && (
-                <div ref={snippetRef} className="mt-4">
+                <div className="mt-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Generated Code Snippet</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{generatedCode}</pre>
                     <button

@@ -12,11 +12,6 @@ const TestCaseGenerator = ({ apiKey }) => {
     const [code, setCode] = useState('');
     const [testCases, setTestCases] = useState('');
     const [loading, setLoading] = useState(false);
-    const testCasesRef = useRef(null);
-
-    const scrollToTestCases = () => {
-        testCasesRef.current.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -36,7 +31,6 @@ const TestCaseGenerator = ({ apiKey }) => {
             });
 
             setTestCases(chatResponse.choices[0].message.content);
-            scrollToTestCases();
             return toast.success('Test cases generated successfully!');
         } catch (error) {
             return toast.error('Error generating test cases! Please try again.');
@@ -80,7 +74,7 @@ const TestCaseGenerator = ({ apiKey }) => {
                 {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Generate Test Cases'}
             </button>
             {testCases && (
-                <div ref={testCasesRef} className="mt-4">
+                <div className="mt-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Generated Test Cases</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{testCases}</pre>
                     <button

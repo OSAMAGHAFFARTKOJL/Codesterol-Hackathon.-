@@ -13,11 +13,6 @@ const CodeConversionAssistant = ({ apiKey }) => {
     const [targetLanguage, setTargetLanguage] = useState('');
     const [conversionResult, setConversionResult] = useState('');
     const [loading, setLoading] = useState(false);
-    const conversionRef = useRef(null);
-
-    const scrollToConversion = () => {
-        conversionRef.current.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -37,7 +32,6 @@ const CodeConversionAssistant = ({ apiKey }) => {
             });
 
             setConversionResult(chatResponse.choices[0].message.content);
-            scrollToConversion();
             return toast.success('Code converted successfully!');
         } catch (error) {
             return toast.error('Error converting code! Please try again.');
@@ -86,10 +80,10 @@ const CodeConversionAssistant = ({ apiKey }) => {
                 className={`w-full px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75 flex items-center justify-center ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
                 disabled={loading}
             >
-                {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Convert Code'}
+                {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Convert Legacy Code'}
             </button>
             {conversionResult && (
-                <div ref={conversionRef} className="mt-4">
+                <div className="mt-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Converted Code</h2>
                     <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">{conversionResult}</pre>
                     <button
